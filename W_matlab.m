@@ -1,4 +1,6 @@
 
+%This matlab program is used to analyze the x-ray diffraction pattern of tungsten 
+%tungsten has the BCC structure 
 
 %get the file contents
 file='path.txt';

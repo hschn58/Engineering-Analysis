@@ -14,7 +14,7 @@
 
 
 %get the file contents
-file='/Users/henryschnieders/downloads/W.txt';
+file='out_path/W.txt';
 Table=readtable(file);
 Table=table2array(Table);
 
@@ -52,7 +52,7 @@ grid on;
 
 
 %save the diffraction pattern figure
-print(gcf, '/Users/henryschnieders/downloads/W_pattern.png', '-dpng', '-r900');
+print(gcf, 'out_path/W_pattern.png', '-dpng', '-r900');
 
 
 
@@ -114,24 +114,10 @@ plot(ctheta_2, y_fit, 'r', 'LineWidth', 2);
 
 grid on;
 
-print(gcf, '/Users/henryschnieders/downloads/W_pattern_a0s.png', '-dpng', '-r900');
+
+print(gcf, 'out_path/W_pattern_a0s.png', '-dpng', '-r900');
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-%the y-intercept is 4.1159
-%disp(coefficients(2))
 %tungsten lattice parameter is 3.165A
 
 
@@ -207,30 +193,15 @@ mu=3216.54;
 
 delta= 180 ./(pi*mu*180.*(tan(t_new./2)+cot(t_new-a)));
 
-%do not expect the values to be significant since mu is greater than 100. 
+%do not expect the error associated with x-ray absorption
+%to be significant since mu is greater than 100. 
 
-% disp(delta)
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% disp(Table)
-% 
-% disp(a_0)
-% disp(hkl2)
-% disp(d)
-% disp(xpeaks)
-
-%put data in a table in excel
 
 T=[xpeaks, pks, d, hkl2.^(2)', a_0', delta_t, s, delta];
 
-Table = array2table(T, 'VariableNames', {'2Theta','Intensity','d_hkl','hkl^2','a_0', 'Hieght imacted shift (deg)', 'Height Error', 'Transparency-Induced shift (deg)'});
+Table = array2table(T, 'VariableNames', {'2Theta (degrees)','Intensity (counts)','d_hkl','hkl^2','a_0', 'Height imacted shift (deg)', 'Height Error', 'Transparency-Induced shift (deg)'});
 
-writetable(Table, '/Users/henryschnieders/downloads/peaks.csv');
+writetable(Table, 'out_path/peaks.csv');
 
 
 

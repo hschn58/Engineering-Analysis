@@ -1,9 +1,40 @@
 import matplotlib.pyplot as plt
-
+import pandas as pd
 import numpy as np
 
+"""
+This program was used to determine the diffusion constant of carbon diffusing
+in 1018 steel via pack carburization. Data plotted is Knoop hardness for each student
+in the second semester materials science laboratory class at UW-Madison. While the 
+data is quite messy, an accurate approximation of the diffusion constant could be 
+obtained. 
 
-data_file="Path"
+The diffusion constant measurement was based on the relationship between knoop 
+hardness and the carbon concentration in steel, which can then be written in terms of 
+the diffusion distance, time, and diffusion constant which is given by the following:
+
+(H(x,t)-H_0)/(H_s-H_0)=erf((x/(2*sqrt(D*t))))
+
+where the hardness at surface is H_s, 
+the unaltered steel hardness is H_0, 
+the hardness at a given diffusion depth in time is H(x,t)
+the diffusion depth is x
+the diffusion constant is D
+the diffusion time is t
+
+
+
+Returns:
+     
+    This gives a diffusion constant of 8.426*10^-10 (m^2/s)
+    The theoretically predicted value is 3.028*10^-11 (m^2/s), not bad!
+    
+"""
+
+########################################################################################################################
+#Plot
+########################################################################################################################
+data_file='/Users/henryschnieders/Documents/CS Stuff/Python/Projects/MSE_Lab_Processing/361/Lab report 1/data_hardness.xlsx'
 
 data=pd.read_excel(data_file)
 
@@ -16,6 +47,10 @@ xdat=[]
 ydat=[]
 
 for dset in range(data_length):
+
+    #data was ordered in excel such that column titles were blank
+    #gave default name 'Unnamed: X'
+
     ydat+=[data[f'Unnamed: {7+2*dset}'].dropna(axis=0)]
 
     xvar=data[f'Unnamed: {6+2*dset}'].dropna(axis=0)
@@ -97,4 +132,130 @@ plt.grid('on')
 
 plt.savefig("out_path", dpi=1200)
 
+
 plt.show()
+
+########################################################################################################################
+#Diffusion constant
+########################################################################################################################
+
+
+from scipy.special import erfinv
+
+
+
+#estimate hardness of 1018 steel as lowest hardness measurement across all data
+h_0=228.6
+
+
+
+def get_hardness(xdat, ydat, tkeys, point,h_0=h_0):
+
+    
+    h_0=h_0
+
+    D_hardness=[]
+    for i in range(len(tkeys)):
+        
+        ydata=np.array(ydat[i])
+        xdata=np.array(xdat[i])
+
+
+        try:
+
+            if len(ydata)<3:
+
+                #if length is less than 3, take H(x,t) to be first point
+
+                average=np.average(ydata[:])
+
+                inner=(ydata[point]-h_0)/(average-h_0)
+
+                D=erfinv(inner)
+
+                other=(2*np.sqrt(float(tkeys[i]))*(1/xdata[point]))
+
+                d_const=(D*other)**(-2)
+
+                D_hardness+=[[d_const,tkeys[i]]]
+
+            else:
+
+                #if length is longer, take a point further from surface since a lot of data went down then up
+
+                average=np.average(ydata[:3])
+
+                inner=(ydata[point]-h_0)/(average-h_0)
+
+                D=erfinv(inner)
+
+
+                other=(2*np.sqrt(float(tkeys[i]))*(1/xdata[point]))
+
+                d_const=((D*other)**(-2))*(10**(-6))**2
+
+                D_hardness+=[[d_const,tkeys[i], point]]
+                
+        except IndexError:
+            continue
+
+    return D_hardness
+
+end=max(len(x) for x in xdat)
+
+all_hardness_data=[]
+for i in range(end-3):
+    j=i+3
+    
+    all_hardness_data+=[get_hardness(xdat, ydat, tkeys, j)]
+    
+
+data1=[item for sublist in all_hardness_data for item in sublist]
+
+data1=pd.DataFrame(data1,columns=['Value', 'Time', 'Index'])
+
+pivot_df = data1.pivot(index='Index', columns='Time', values='Value')    
+
+
+#number of measurement points at each carburization time duration
+weights = {
+     '500': 14,
+    '750': 13,
+    '1000': 13,
+    '1250': 11,
+    '1500': 12,
+    '1750': 15,
+    '2000': 15,
+    '2250': 2,
+    '2500': 13,
+    '2750': 12,
+    '3000': 18
+    # Add weights for all other time columns
+}
+
+#remove lowest value estimated as h_0 to not skew the result
+pivot_df.at[13,'500']=0
+
+df_nonzero = pivot_df.replace(np.nan, 0)
+
+
+pivot_df_nonzero = df_nonzero
+
+# Calculate weighted values for each column based on the weights.
+# This ensures we only work with DataFrame operations.
+weighted_values = pivot_df_nonzero * pivot_df_nonzero.columns.map(weights)
+
+# Sum the weighted values across all columns (numerator for the weighted average)
+numerator = weighted_values.sum().sum()
+
+# Calculate the denominator: the sum of weights for each non-NaN entry in each column
+denominator_weights = pivot_df_nonzero.notna() * pivot_df_nonzero.columns.map(weights)
+denominator = denominator_weights.sum().sum()
+
+# Calculate the weighted average
+weighted_average = numerator / denominator    
+    
+print(weighted_average)
+
+#This gives a diffusion constant of 8.426*10^-10 (m^2/s)
+#The theoretically predicted value is 3.028*10^-11 (m^2/s), not bad!

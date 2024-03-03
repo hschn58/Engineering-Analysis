@@ -1,7 +1,7 @@
 
 
 %get the file contents
-file='/Users/henryschnieders/downloads/W.txt';
+file='path.txt';
 Table=readtable(file);
 Table=table2array(Table);
 
@@ -37,7 +37,7 @@ xlabel('2$\theta$ ($^\circ$)', 'Interpreter', 'latex', 'FontSize',16);
 ylabel('Intensity (counts)', 'FontSize',16);
 grid on;
 
-print(gcf, '/Users/henryschnieders/downloads/W_pattern.png', '-dpng', '-r900');
+print(gcf, 'out_path/W_pattern.png', '-dpng', '-r900');
 
 
 
@@ -97,7 +97,7 @@ plot(ctheta_2, y_fit, 'r', 'LineWidth', 2);
 
 grid on;
 
-print(gcf, '/Users/henryschnieders/downloads/W_pattern_a0s.png', '-dpng', '-r900');
+print(gcf, 'out_path/W_pattern_a0s.png', '-dpng', '-r900');
 
 
 
@@ -213,7 +213,7 @@ T=[xpeaks, pks, d, hkl2.^(2)', a_0', delta_t, s, delta];
 
 Table = array2table(T, 'VariableNames', {'2Theta','Intensity','d_hkl','hkl^2','a_0', 'Hieght imacted shift (deg)', 'Height Error', 'Transparency-Induced shift (deg)'});
 
-writetable(Table, '/Users/henryschnieders/downloads/peaks.csv');
+writetable(Table, 'out_path/peaks.csv');
 
 
 

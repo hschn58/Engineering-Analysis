@@ -34,7 +34,7 @@ Returns:
 ########################################################################################################################
 #Plot
 ########################################################################################################################
-data_file='/Users/henryschnieders/Documents/CS Stuff/Python/Projects/MSE_Lab_Processing/361/Lab report 1/data_hardness.xlsx'
+data_file='path.xlsx'
 
 data=pd.read_excel(data_file)
 

@@ -34,7 +34,7 @@ Returns:
 ########################################################################################################################
 #Plot
 ########################################################################################################################
-data_file='/Users/henryschnieders/Documents/CS Stuff/Python/Projects/MSE_Lab_Processing/361/Lab report 1/data_hardness.xlsx'
+data_file='path.xlsx'
 
 data=pd.read_excel(data_file)
 
@@ -215,8 +215,9 @@ data1=[item for sublist in all_hardness_data for item in sublist]
 data1=pd.DataFrame(data1,columns=['Value', 'Time', 'Index'])
 
 pivot_df = data1.pivot(index='Index', columns='Time', values='Value')    
-    
 
+
+#number of measurement points at each carburization time duration
 weights = {
      '500': 14,
     '750': 13,
